@@ -1,0 +1,9 @@
+{"_note": "FAKE demo data in the source's shape, used only when USE_SAMPLE_DATA=1",
+ "quests": [
+  {"lat": 40.7484, "lng": -73.9857, "name": "Sample Stop A", "rewards_string": "Eternatus Candy", "conditions_string": "Make an Excellent Throw", "rewards_ids": ["890"], "expiration": 1795050000},
+  {"lat": 40.7580, "lng": -73.9855, "name": "Sample Stop B", "rewards_string": "Eternatus Candy", "conditions_string": "Make an Excellent Throw", "rewards_ids": ["890"], "expiration": 1795050000},
+  {"lat": 40.7484, "lng": -73.9857, "name": "Sample Stop A dup", "rewards_string": "Eternatus Candy", "conditions_string": "Make an Excellent Throw", "rewards_ids": ["890"]},
+  {"lat": 40.70, "lng": -74.01, "name": "Wrong task", "rewards_string": "Eternatus Candy", "conditions_string": "Catch 5 Pokemon", "rewards_ids": ["890"]},
+  {"lat": 40.71, "lng": -74.00, "name": "Wrong reward", "rewards_string": "Pikachu", "conditions_string": "Make an Excellent Throw", "rewards_ids": ["25"]},
+  {"lat": 999, "lng": -74.00, "name": "Bad coords", "rewards_string": "Eternatus Candy", "conditions_string": "Make an Excellent Throw", "rewards_ids": ["890"]}
+ ]}
