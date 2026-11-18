@@ -50,6 +50,10 @@ input, select { font: inherit; padding: 6px 8px; border: 1px solid var(--border)
 .card-title { font-weight: 600; }
 .card-quest { color: var(--fg); }
 .card-coords, .card-dist { color: var(--muted); font-size: .85rem; font-variant-numeric: tabular-nums; }
+.marker-done { filter: hue-rotate(-90deg) saturate(1.6) brightness(.95); }
+.card.done { border-color: #16a34a; opacity: .75; }
+.btn.done-btn { background: #16a34a; border-color: #16a34a; color: #fff; }
+.toggle { display: inline-flex; gap: 6px; align-items: center; font-size: .9rem; color: var(--muted); }
 .card-actions { display: flex; flex-wrap: wrap; gap: 8px; }
 .leaflet-popup-content .btn { margin: 6px 0; color: #1a1d23; background: #fff; }
 .mapwrap { position: sticky; top: 12px; }

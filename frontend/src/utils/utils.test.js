@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { calculateDistanceKm, formatDistance, parseCoord, withDistances } from "./distance.js";
 import { getGoogleMapsUrl } from "./mapsUrl.js";
+import { loadDone, pruneDone, saveDone, toggleDone } from "./doneStore.js";
 import { validateResponse } from "../services/questApi.js";
 
 describe("distance", () => {
@@ -49,6 +50,21 @@ describe("withDistances", () => {
   });
   it("leaves order alone without a location", () => {
     expect(withDistances(qs, null, 5).map((q) => q.id)).toEqual(["a", "b", "c"]);
+  });
+});
+
+describe("doneStore", () => {
+  it("toggles without mutating and prunes old marks", () => {
+    const a = toggleDone({}, "x", 1000);
+    expect(a).toEqual({ x: 1000 });
+    expect(toggleDone(a, "x")).toEqual({});
+    const old = Date.now() - 8 * 24 * 60 * 60 * 1000;
+    expect(pruneDone({ old, fresh: Date.now(), bad: "z" })).toHaveProperty("fresh");
+    expect(Object.keys(pruneDone({ old, bad: "z" }))).toHaveLength(0);
+  });
+  it("load/save tolerate missing or blocked storage", () => {
+    expect(loadDone()).toEqual({});
+    expect(() => saveDone({ a: 1 })).not.toThrow();
   });
 });
 

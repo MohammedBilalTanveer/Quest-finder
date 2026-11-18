@@ -18,6 +18,9 @@ const icon = L.icon({
   shadowSize: [41, 41],
 });
 
+// Same pin, recoloured green via CSS (.marker-done) for quests the user marked done.
+const doneIcon = L.icon({ ...icon.options, className: "marker-done" });
+
 const DEFAULT_CENTER = [40.7128, -74.006]; // only used when there are no results
 
 function FitBounds({ quests, userLocation }) {
@@ -45,7 +48,7 @@ function SelectedFocus({ quest, markerRefs }) {
   return null;
 }
 
-export default function QuestMap({ quests, userLocation, selected }) {
+export default function QuestMap({ quests, userLocation, selected, done, onToggleDone }) {
   const markerRefs = useRef({});
   return (
     <MapContainer center={DEFAULT_CENTER} zoom={11} className="map" scrollWheelZoom>
@@ -61,7 +64,7 @@ export default function QuestMap({ quests, userLocation, selected }) {
           <Marker
             key={q.id}
             position={[q.latitude, q.longitude]}
-            icon={icon}
+            icon={done[q.id] ? doneIcon : icon}
             ref={(m) => {
               if (m) markerRefs.current[q.id] = m;
               else delete markerRefs.current[q.id];
@@ -75,6 +78,9 @@ export default function QuestMap({ quests, userLocation, selected }) {
               {q.latitude.toFixed(6)}, {q.longitude.toFixed(6)}
               {q.distanceKm != null && (<><br />{formatDistance(q.distanceKm)} away</>)}
               <br />
+              <button type="button" className="btn small" onClick={() => onToggleDone(q.id)}>
+                {done[q.id] ? "Done ✓ (undo)" : "Mark as done"}
+              </button>{" "}
               <CopyButton latitude={q.latitude} longitude={q.longitude} />
               {url && (
                 <>

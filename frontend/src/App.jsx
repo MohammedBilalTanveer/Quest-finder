@@ -8,6 +8,7 @@ import RefreshButton from "./components/RefreshButton.jsx";
 import StatusMessage from "./components/StatusMessage.jsx";
 import { fetchQuests } from "./services/questApi.js";
 import { withDistances } from "./utils/distance.js";
+import { loadDone, saveDone, toggleDone } from "./utils/doneStore.js";
 
 export default function App() {
   const [data, setData] = useState(null); // last successful, validated response
@@ -18,7 +19,17 @@ export default function App() {
   const [userLocation, setUserLocation] = useState(null);
   const [radius, setRadius] = useState(null);
   const [selectedId, setSelectedId] = useState(null);
+  const [done, setDone] = useState(loadDone); // this browser's own marks
+  const [hideDone, setHideDone] = useState(false);
   const inFlight = useRef(false);
+
+  const onToggleDone = useCallback((id) => {
+    setDone((prev) => {
+      const next = toggleDone(prev, id);
+      saveDone(next);
+      return next;
+    });
+  }, []);
 
   const load = useCallback(async (refresh) => {
     if (inFlight.current) return; // never overlap requests
@@ -42,10 +53,11 @@ export default function App() {
     load(false);
   }, [load]);
 
-  const visible = useMemo(
-    () => withDistances(data?.results ?? [], userLocation, radius),
-    [data, userLocation, radius]
-  );
+  const visible = useMemo(() => {
+    const list = withDistances(data?.results ?? [], userLocation, radius);
+    return hideDone ? list.filter((q) => !done[q.id]) : list;
+  }, [data, userLocation, radius, hideDone, done]);
+  const doneCount = (data?.results ?? []).filter((q) => done[q.id]).length;
   const selected = visible.find((q) => q.id === selectedId) ?? null;
   const stale = Boolean(error && data);
   const total = data?.results.length ?? 0;
@@ -61,6 +73,10 @@ export default function App() {
           {data ? `${visible.length} matching quest${visible.length === 1 ? "" : "s"}` : ""}
           {data && visible.length !== total ? ` (of ${total})` : ""}
         </span>
+        <label className="toggle">
+          <input type="checkbox" checked={hideDone} onChange={(e) => setHideDone(e.target.checked)} />
+          Hide done ({doneCount})
+        </label>
         <span className="updated">
           {lastUpdated ? `Last updated: ${lastUpdated.toLocaleString()}` : ""}
           {data?.cached ? " (cached)" : ""}
@@ -97,10 +113,22 @@ export default function App() {
             radius={radius}
             onRadius={setRadius}
           />
-          <QuestList quests={visible} selectedId={selectedId} onSelect={setSelectedId} />
+          <QuestList
+            quests={visible}
+            selectedId={selectedId}
+            done={done}
+            onSelect={setSelectedId}
+            onToggleDone={onToggleDone}
+          />
         </div>
         <div className="mapwrap">
-          <QuestMap quests={visible} userLocation={userLocation} selected={selected} />
+          <QuestMap
+            quests={visible}
+            userLocation={userLocation}
+            selected={selected}
+            done={done}
+            onToggleDone={onToggleDone}
+          />
         </div>
       </div>
 
