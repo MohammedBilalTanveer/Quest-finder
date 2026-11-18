@@ -16,7 +16,7 @@ class Settings:
     cache_ttl: float = float(os.getenv("CACHE_TTL_SECONDS", "60"))
     min_source_interval: float = float(os.getenv("MIN_SOURCE_INTERVAL_SECONDS", "10"))
     allowed_origins: tuple = tuple(
-        o.strip()
+        o.strip().rstrip("/")
         for o in os.getenv(
             "ALLOWED_ORIGINS", "http://localhost:5173,http://127.0.0.1:5173"
         ).split(",")
