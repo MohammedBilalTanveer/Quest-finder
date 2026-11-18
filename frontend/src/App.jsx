@@ -18,7 +18,10 @@ export default function App() {
   const [lastUpdated, setLastUpdated] = useState(null);
   const [userLocation, setUserLocation] = useState(null);
   const [radius, setRadius] = useState(null);
-  const [selectedId, setSelectedId] = useState(null);
+  const [selection, setSelection] = useState({ id: null, n: 0 });
+  const selectedId = selection.id;
+  // n changes on every pick, so tapping the same card again re-centres the map.
+  const setSelectedId = useCallback((id) => setSelection((s) => ({ id, n: s.n + 1 })), []);
   const [done, setDone] = useState(loadDone); // this browser's own marks
   const [hideDone, setHideDone] = useState(false);
   const inFlight = useRef(false);
@@ -53,10 +56,16 @@ export default function App() {
     load(false);
   }, [load]);
 
-  const visible = useMemo(() => {
-    const list = withDistances(data?.results ?? [], userLocation, radius);
-    return hideDone ? list.filter((q) => !done[q.id]) : list;
-  }, [data, userLocation, radius, hideDone, done]);
+  // Everything matching location/radius. The map frames this set, so marking quests
+  // done (or hiding them) never changes the map's zoom or position.
+  const located = useMemo(
+    () => withDistances(data?.results ?? [], userLocation, radius),
+    [data, userLocation, radius]
+  );
+  const visible = useMemo(
+    () => (hideDone ? located.filter((q) => !done[q.id]) : located),
+    [located, hideDone, done]
+  );
   const doneCount = (data?.results ?? []).filter((q) => done[q.id]).length;
   const selected = visible.find((q) => q.id === selectedId) ?? null;
   const stale = Boolean(error && data);
@@ -124,8 +133,10 @@ export default function App() {
         <div className="mapwrap">
           <QuestMap
             quests={visible}
+            fitQuests={located}
             userLocation={userLocation}
             selected={selected}
+            selectionKey={selection.n}
             done={done}
             onToggleDone={onToggleDone}
           />
