@@ -22,6 +22,11 @@ def quests(refresh: bool = Query(False)):
         raise HTTPException(502, "The quest data source changed its format and cannot be read right now.")
 
 
+@router.get("/")
+def root():
+    return {"service": "pokemon-quest-finder-api", "quests": "/api/quests", "health": "/api/health"}
+
+
 @router.get("/api/health")
 def health():
     return {"status": "ok"}

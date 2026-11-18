@@ -12,7 +12,10 @@ export async function fetchQuests({ refresh = false, signal } = {}) {
     });
   } catch (err) {
     if (err.name === "AbortError") throw err;
-    throw new Error("Cannot reach the quest server. Is the backend running?");
+    throw new Error(
+      `Cannot reach the quest server (${API_BASE || "this site's own /api"}). ` +
+        "Check that the backend is running, VITE_API_BASE_URL is correct, and ALLOWED_ORIGINS includes this site's address."
+    );
   }
 
   if (!response.ok) {
